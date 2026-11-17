@@ -1,0 +1,22 @@
+{
+  "name": "apis-mechanica",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build --base=./",
+    "postbuild": "node -e \"require('node:fs').copyFileSync('LICENSE', 'dist/LICENSE')\"",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@fontsource/instrument-sans": "^5.2.0",
+    "@fontsource/instrument-serif": "^5.2.0",
+    "@fontsource/jetbrains-mono": "^5.2.0",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "vite": "^8.0.0"
+  }
+}

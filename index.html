@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f2ebdc" />
+    <meta name="description" content="Apis Mechanica. An interactive study in porcelain, gilt, and the mechanics of honeybee flight." />
+    <link rel="icon" type="image/svg+xml" href="/apis-mark.svg" />
+    <title>Apis Mechanica — An articulated flying machine</title>
+  </head>
+  <body>
+    <main id="exhibit" aria-label="Apis Mechanica interactive exhibit">
+      <div id="stage" aria-label="Three-dimensional mechanical honeybee"></div>
+      <canvas id="annotations" class="chrome" aria-hidden="true"></canvas>
+      <div id="part-labels" class="chrome"></div>
+
+      <div class="registration chrome" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <header class="masthead chrome">
+        <p class="figure-id"><span class="figure-tick" aria-hidden="true"></span> FIG. II <span class="figure-dash">—</span> ORNITHOPTER HYMENOPTERA</p>
+        <h1><em>Apis</em> Mechanica</h1>
+        <p class="edition">CONCEPT Nº 08 <b>·</b> ARTICULATED FLYING MACHINE <b>·</b> 1 : 1 STUDY</p>
+      </header>
+
+      <aside class="upper-right chrome" aria-label="Finish and specimen status">
+        <div class="theme-picker" role="group" aria-label="Finish">
+          <button type="button" data-theme="0" aria-pressed="true" title="Porcelain &amp; Gilt"><i class="swatch gilt"></i><span>Porcelain &amp; Gilt</span></button>
+          <button type="button" data-theme="1" aria-pressed="false" title="Delft"><i class="swatch delft"></i><span>Delft</span></button>
+          <button type="button" data-theme="2" aria-pressed="false" title="Obsidian &amp; Amber"><i class="swatch obsidian"></i><span>Obsidian &amp; Amber</span></button>
+          <button type="button" data-theme="3" aria-pressed="false" title="Codex"><i class="swatch codex"></i><span>Codex</span></button>
+        </div>
+        <div class="status"><i id="status-light" aria-hidden="true"></i><span id="flight-status" role="status">RESTING</span><b>·</b><span id="assembly-status">ASSEMBLY 0%</span></div>
+      </aside>
+
+      <aside id="specification" class="specification chrome" aria-label="Specification">
+        <div class="panel-heading"><span>SPECIFICATION</span><span id="spec-index">II / 08</span></div>
+        <h2 id="spec-title">The honeybee</h2>
+        <p id="spec-description">An articulated study of <em>Apis mellifera</em>, cast in porcelain, gilt and etched glass.</p>
+        <p id="spec-material" hidden></p>
+        <p id="spec-fact" hidden></p>
+        <button type="button" id="proboscis-action" class="spec-action" hidden>Extend glossa</button>
+        <dl class="spec-metrics" id="spec-metrics">
+          <div><dt>SPAN</dt><dd>186 <small>mm</small></dd></div>
+          <div><dt>MASS</dt><dd>64 <small>g</small></dd></div>
+          <div><dt>BEAT</dt><dd>230 <small>Hz</small></dd></div>
+          <div><dt>STROKE</dt><dd>90<small>°</small></dd></div>
+        </dl>
+      </aside>
+
+      <aside id="telemetry" class="telemetry chrome" aria-label="Live flight telemetry" aria-hidden="true" inert>
+        <div class="panel-heading"><span>FLIGHT TELEMETRY</span><span id="telemetry-clock">00.0 s</span></div>
+        <dl><div><dt>ALT</dt><dd id="altitude">00 cm</dd></div><div><dt>AIRSPEED</dt><dd id="airspeed">0.00 m/s</dd></div><div><dt>HEADING</dt><dd id="heading">000°</dd></div><div><dt>BEAT</dt><dd id="beat">230 Hz</dd></div></dl>
+        <canvas id="oscilloscope" width="510" height="64" aria-label="Left and right wing phase"></canvas>
+      </aside>
+
+      <aside class="controls-legend chrome" aria-label="Desktop shortcuts">
+        <div class="panel-heading"><span>CONTROLS</span><span aria-hidden="true">+</span></div>
+        <div class="shortcut-grid">
+          <span><kbd>Drag</kbd> Orbit</span><span><kbd>Scroll</kbd> Zoom</span>
+          <span><kbd>Right drag</kbd> Pan</span><span><kbd>F</kbd> Flight</span>
+          <span><kbd>E</kbd> Explode</span><span><kbd>T</kbd> Theme</span>
+          <span><kbd>R</kbd> Render</span><span><kbd>1–5</kbd> Views</span>
+          <span><kbd>Space</kbd> Pause</span><span><kbd>H</kbd> Hide UI</span>
+        </div>
+      </aside>
+
+      <nav id="console" class="console chrome" aria-label="Exhibit controls">
+        <div class="range-control assembly-control">
+          <label for="assembly"><span>Assembled</span><span>Exploded</span></label>
+          <input id="assembly" aria-label="Exploded view" type="range" min="0" max="1" value="0" step="0.001" />
+        </div>
+        <button type="button" id="flight-toggle" class="flight-toggle" aria-pressed="false"><span class="flight-symbol" aria-hidden="true"></span><span id="flight-label">Take flight</span></button>
+        <div class="console-group view-control"><span class="control-label" id="view-label">View</span><div class="segments" role="group" aria-labelledby="view-label">
+          <button type="button" data-view="0" aria-pressed="true">Iso</button><button type="button" data-view="1" aria-pressed="false">Plan</button><button type="button" data-view="2" aria-pressed="false">Front</button><button type="button" data-view="3" aria-pressed="false">Profile</button><button type="button" data-view="4" aria-pressed="false">Macro</button>
+        </div></div>
+        <div class="console-group render-control"><span class="control-label" id="render-label">Render</span><div class="segments" role="group" aria-labelledby="render-label">
+          <button type="button" data-render="0" aria-pressed="true">Solid</button><button type="button" data-render="1" aria-pressed="false">Section</button><button type="button" data-render="2" aria-pressed="false">Schematic</button>
+        </div></div>
+        <button type="button" id="orbit-toggle" class="orbit-toggle" aria-pressed="false"><span aria-hidden="true">↻</span> Orbit</button>
+        <div class="range-control tempo-control">
+          <label for="tempo"><span>Tempo</span><output id="tempo-value" for="tempo">1.00×</output></label>
+          <input id="tempo" aria-label="Playback tempo" type="range" min="0" max="1" step="0.001" value="1" />
+        </div>
+        <button type="button" id="mobile-hide" class="mobile-hide" aria-label="Hide interface" title="Hide interface">⌑</button>
+      </nav>
+      <button id="restore-ui" type="button" hidden>Show interface</button>
+      <p id="renderer-error" role="alert" hidden></p>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
