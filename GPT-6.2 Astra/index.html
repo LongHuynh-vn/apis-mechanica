@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#f6f4ec" />
+    <title>Apis Mechanica — Form &amp; Field</title>
+    <link rel="icon" href="/mark.svg" type="image/svg+xml" />
+    <link
+      rel="preload"
+      as="font"
+      href="/fonts/instrument-serif-normal-400.woff2"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      href="/fonts/instrument-serif-italic-400.woff2"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main id="exhibit" aria-label="Apis Mechanica interactive exhibition">
+      <canvas
+        id="stage"
+        aria-label="Interactive three-dimensional mechanical honeybee. Drag to orbit, scroll to zoom, or select a component."
+        tabindex="0"
+      ></canvas>
+      <div id="surface-wash" aria-hidden="true"></div>
+      <svg id="leaders" class="diagram-layer" aria-hidden="true"></svg>
+      <div id="labels" class="diagram-layer"></div>
+      <div id="chrome">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i
+        ><i class="corner br"></i>
+        <header class="masthead">
+          <div class="wordmark">
+            <svg viewBox="0 0 36 32" aria-hidden="true"><use href="#i-mark" /></svg
+            ><span>Form <i>&amp;</i> Field</span>
+          </div>
+          <span class="mast-divider"></span
+          ><span class="micro mast-caption">Natural History Collection</span>
+          <span class="mast-right"
+            ><i></i><span class="micro">Interactive study</span><span class="mast-divider"></span
+            ><span class="micro">Plate <b>002</b></span></span
+          >
+        </header>
+        <section class="identity">
+          <div class="eyebrow">
+            <span class="short-rule"></span> FIG. II <span class="muted">/</span> ORNITHOPTER
+            HYMENOPTERA
+          </div>
+          <h1>Apis <em>Mechanica</em></h1>
+          <p class="edition">
+            Concept Nº 08 <b>·</b> Articulated flying machine <b>·</b> 1 : 1 study
+          </p>
+        </section>
+        <aside class="finishes" aria-label="Exhibition theme">
+          <div class="group-label">Material edition</div>
+          <div class="finish-pill" role="group" aria-label="Select material edition">
+            <button
+              data-theme="0"
+              aria-label="Porcelain & Gilt"
+              title="Porcelain & Gilt"
+              aria-pressed="true"
+            >
+              <i style="--swatch: #d5be84; --swatch2: #f9f1d3"></i><span>Porcelain &amp; Gilt</span>
+            </button>
+            <button data-theme="1" aria-label="Delft" title="Delft" aria-pressed="false">
+              <i style="--swatch: #536d91; --swatch2: #a0b1c4"></i><span>Delft</span>
+            </button>
+            <button
+              data-theme="2"
+              aria-label="Obsidian & Amber"
+              title="Obsidian & Amber"
+              aria-pressed="false"
+            >
+              <i style="--swatch: #272c2b; --swatch2: #64625a"></i><span>Obsidian &amp; Amber</span>
+            </button>
+            <button data-theme="3" aria-label="Codex" title="Codex" aria-pressed="false">
+              <i style="--swatch: #ad8760; --swatch2: #d9b98a"></i><span>Codex</span>
+            </button>
+          </div>
+          <div class="status">
+            <i id="status-dot"></i><span id="status-text" role="status">Resting</span><b>·</b
+            ><span>Assembly <strong id="assembly-pct">0%</strong></span>
+          </div>
+        </aside>
+        <section class="specs" aria-label="Specimen specifications">
+          <div class="group-label ruled"><span id="spec-label">Specification</span><i></i></div>
+          <h2 id="spec-name">Apis mellifera</h2>
+          <div id="spec-material" hidden><span>Material</span><b></b></div>
+          <p id="spec-description">
+            A mechanical honeybee in glazed porcelain, polished gold and etched glass.
+          </p>
+          <p id="spec-fact" hidden></p>
+          <button id="glossa" hidden>Extend glossa</button>
+          <dl class="metrics">
+            <div>
+              <dt>Span</dt>
+              <dd>186 <small>mm</small></dd>
+            </div>
+            <div>
+              <dt>Mass</dt>
+              <dd>64 <small>g</small></dd>
+            </div>
+            <div>
+              <dt>Beat</dt>
+              <dd>230 <small>Hz</small></dd>
+            </div>
+            <div>
+              <dt>Stroke</dt>
+              <dd>90<small>°</small></dd>
+            </div>
+          </dl>
+        </section>
+        <aside id="telemetry" aria-label="Flight telemetry">
+          <div class="group-label ruled">Flight telemetry<i></i></div>
+          <div class="tele-data">
+            <span>ALT <b id="alt">0</b></span
+            ><span>AIR <b id="air">0</b></span
+            ><span>HDG <b id="hdg">000°</b></span
+            ><span>BEAT <b id="hz">0 Hz</b></span>
+          </div>
+          <canvas
+            id="scope"
+            width="292"
+            height="38"
+            aria-label="Left and right wing stroke oscillogram"
+          ></canvas>
+        </aside>
+        <aside class="controls-help">
+          <button id="help-toggle" aria-expanded="true" aria-controls="help-keys">
+            <svg><use href="#i-keys" /></svg> Controls <span class="help-chevron">⌃</span>
+          </button>
+          <div id="help-keys">
+            <div><kbd>drag</kbd> Orbit</div>
+            <div><kbd>scroll</kbd> Zoom</div>
+            <div><kbd>right-drag</kbd> Pan</div>
+            <div><kbd>1–5</kbd> Views</div>
+            <div><kbd>F</kbd> Flight <kbd>E</kbd> Explode</div>
+            <div><kbd>T</kbd> Theme <kbd>R</kbd> Render</div>
+            <div><kbd>space</kbd> Pause</div>
+            <div><kbd>H</kbd> Hide UI</div>
+          </div>
+        </aside>
+        <nav id="console" aria-label="Study controls">
+          <label class="assembly control-stack"
+            ><span class="ctrl-label"
+              ><span>Assembled</span><span class="direction">↔</span><span>Exploded</span></span
+            ><input
+              id="explode"
+              type="range"
+              min="0"
+              max="100"
+              step="0.1"
+              value="0"
+              aria-label="Exploded view"
+          /></label>
+          <button id="flight" class="flight">
+            <svg><use href="#i-wing" /></svg><span>Take flight</span>
+          </button>
+          <div class="split"></div>
+          <div class="views control-stack">
+            <span class="ctrl-label">View</span>
+            <div id="view-options" class="segments" role="group" aria-label="Camera view"></div>
+          </div>
+          <div class="split"></div>
+          <div class="renders control-stack">
+            <span class="ctrl-label">Render</span>
+            <div id="render-options" class="segments" role="group" aria-label="Render mode"></div>
+          </div>
+          <div class="split"></div>
+          <button id="orbit" class="orbit" aria-pressed="false" title="Toggle automatic orbit">
+            <svg><use href="#i-orbit" /></svg><span>Orbit</span>
+          </button>
+          <label class="tempo control-stack"
+            ><span class="ctrl-label"><span>Tempo</span><output id="tempo-val">1×</output></span
+            ><input
+              id="tempo"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="100"
+              aria-label="Flight tempo"
+          /></label>
+        </nav>
+        <div class="plate-foot">
+          <span><i class="crosshair"></i> Plate II <b>/</b> Entomology</span
+          ><span class="plate-scale"><i></i><span id="scale-value">25 mm</span></span>
+        </div>
+      </div>
+      <div id="notice" role="status"></div>
+    </main>
+    <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <symbol id="i-mark" viewBox="0 0 36 32">
+          <g fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round">
+            <path
+              d="m3 11 7-4 7 4v8l-7 4-7-4zM17 11l7-4 7 4v8l-7 4-7-4zM10 7V4l7-4 7 4v3M10 23v3l7 4 7-4v-3"
+            />
+            <path d="m3 11 7 4 7-4m0 0 7 4 7-4M10 15v8m14-8v8M17 1v9m0 10v10" opacity=".65" />
+          </g>
+        </symbol>
+        <symbol id="i-wing" viewBox="0 0 24 24">
+          <g
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.35"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 19C5 12 9 6 21 3c-1 6-6 13-12 15l-6 1Z" />
+            <path d="m3 19 14-12m-8 7 1-5m2 3 5-1" />
+          </g>
+        </symbol>
+        <symbol id="i-orbit" viewBox="0 0 24 24">
+          <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.3">
+            <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-30 12 12)" />
+            <circle cx="12" cy="12" r="4.3" />
+            <path d="m4 14-.8 3.5L7 17" />
+          </g>
+        </symbol>
+        <symbol id="i-keys" viewBox="0 0 20 16">
+          <g fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="1" y="2" width="18" height="12" rx="2" />
+            <path d="M4 6h1m2 0h1m2 0h1m2 0h1m2 0h1M5 9h1m2 0h1m2 0h1m2 0h1m-8 2h6" />
+          </g>
+        </symbol>
+      </defs>
+    </svg>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

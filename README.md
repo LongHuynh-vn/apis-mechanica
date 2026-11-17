@@ -4,6 +4,8 @@ A Three.js exhibit of an articulated mechanical honeybee. The geometry, wing ven
 
 [Open the live exhibit](https://longhuynh-vn.github.io/apis-mechanica/)
 
+The GPT-6.2 Astra edition has its own [live exhibit](https://longhuynh-vn.github.io/apis-mechanica/GPT-6.2%20Astra/) and [source folder](./GPT-6.2%20Astra/).
+
 ```sh
 npm ci
 npm run dev
