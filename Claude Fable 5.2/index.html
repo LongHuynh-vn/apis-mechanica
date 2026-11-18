@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apis Mechanica — Articulated Flying Machine</title>
+  <meta name="description" content="Apis Mechanica: an interactive study of a mechanical honeybee in porcelain, enamel, precious metal and etched glass.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2.5 27.7 9.25v13.5L16 29.5 4.3 22.75V9.25z' fill='%23f2ece1' stroke='%23b3852c' stroke-width='2'/%3E%3Cpath d='M16 9.5 21.6 12.75v6.5L16 22.5l-5.6-3.25v-6.5z' fill='%23e9a13a'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #efe9df; }
+    #app { position: fixed; inset: 0; }
+    #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; touch-action: none; }
+    #annot, #ui { position: absolute; inset: 0; pointer-events: none; }
+  </style>
+  <link rel="stylesheet" href="src/ui/ui.css">
+  <script type="importmap">
+    { "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <canvas id="gl" tabindex="0"></canvas>
+    <div id="annot"></div>
+    <div id="ui"></div>
+  </div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

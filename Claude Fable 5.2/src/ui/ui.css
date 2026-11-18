@@ -1,0 +1,341 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   ui/ui.css — Apis Mechanica chrome.
+   A museum plate crossed with an engineering drawing: hairlines, tracked mono
+   labels, serif headings, a great deal of air. Every colour derives from the
+   theme variables written onto #app each frame by ui.js.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+#app {
+  /* theme tokens (overwritten every frame during a theme fade by ui.js) */
+  --bg: #efe9df; --bg-edge: #ddd4c5; --line: #a8977a; --ink: #2a2622; --ink-soft: #7d756a;
+  --metal: #b3852c; --accent: #b3852c; --accent-ink: #fffaf0; --glow: #ffb24a;
+  --paper: #f6f1e7; --ink-line: #3a3530; --panel: #f7f3ea;
+
+  --font-serif: 'Instrument Serif', 'Iowan Old Style', 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+
+  /* derived tones — recomputed automatically when the tokens above change */
+  --hair: color-mix(in srgb, var(--line) 62%, transparent);
+  --hair-soft: color-mix(in srgb, var(--line) 34%, transparent);
+  --hair-strong: color-mix(in srgb, var(--ink) 55%, transparent);
+  --wash: color-mix(in srgb, var(--panel) 52%, transparent);
+  --tint: color-mix(in srgb, var(--ink) 7%, transparent);
+  --hw: 1px;
+}
+@media (min-resolution: 2dppx) { #app { --hw: 0.75px; } }
+
+/* ── root & scale ─────────────────────────────────────────────────────────── */
+#ui {
+  /* 1em ≈ 12.7 px at 1920×1080, ≈ 10.5 px at 1366×768, 10.25 px at 1280×720, ≈ 15.2 px at 2560×1440 */
+  font-size: clamp(10.25px, min(0.4vw + 5px, 0.71vh + 5px), 24px);
+  --pad: 2.6em;
+  --gap: 1.6em;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+  overflow: clip;            /* clip, never scroll: a dragged slider must not be able to auto-scroll the whole overlay sideways */
+}
+#ui *, #ui *::before, #ui *::after { box-sizing: border-box; }
+:where(#ui button) {
+  font: inherit; color: inherit; background: none; border: 0; margin: 0; padding: 0;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; appearance: none; -webkit-appearance: none;
+}
+:where(#ui button:focus) { outline: none; }
+/* focus: a hairline ring that follows each control's own shape */
+#ui button:focus-visible, #ui .am-slider:focus-visible {
+  outline: var(--hw) solid var(--hair-strong); outline-offset: 0.3em;
+}
+#ui .am-seg button:focus-visible, #ui .am-slider:focus-visible, #ui .am-toggle:focus-visible { border-radius: 0.3em; }
+#ui .am-slider:focus-visible { outline-offset: 0.1em; }
+#ui .am-slider.is-pointer:focus-visible, #ui .am-legend:focus-visible { outline: none; }   /* the ring is for keyboard focus only */
+#ui .am-interactive { pointer-events: auto; }
+#ui .am-group { will-change: opacity, transform; }
+#ui .am-group.is-off, #ui .am-group.is-off * { pointer-events: none !important; }
+
+/* typographic atoms */
+.am-mono, .am-eyebrow {
+  font-family: var(--font-mono); font-weight: 400; text-transform: uppercase;
+  letter-spacing: 0.2em; font-size: 0.66em; line-height: 1.4; color: var(--ink-soft);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.am-eyebrow { display: flex; align-items: center; gap: 0.9em; }
+
+/* ── frame: registration marks ────────────────────────────────────────────── */
+.am-frame { position: absolute; inset: 1.05em; pointer-events: none; }
+.am-corner { position: absolute; width: 1.5em; height: 1.5em; }
+.am-corner::before, .am-corner::after { content: ''; position: absolute; background: var(--hair); }
+.am-corner::before { width: 100%; height: var(--hw); }
+.am-corner::after { height: 100%; width: var(--hw); }
+.am-corner--tl { left: 0; top: 0; }
+.am-corner--tr { right: 0; top: 0; } .am-corner--tr::after { right: 0; }
+.am-corner--bl { left: 0; bottom: 0; } .am-corner--bl::before { bottom: 0; }
+.am-corner--br { right: 0; bottom: 0; } .am-corner--br::before { bottom: 0; } .am-corner--br::after { right: 0; }
+.am-tick { position: absolute; background: var(--hair-soft); }
+.am-tick--t, .am-tick--b { left: 50%; width: var(--hw); height: 0.7em; }
+.am-tick--t { top: 0; } .am-tick--b { bottom: 0; }
+.am-tick--l, .am-tick--r { top: 50%; height: var(--hw); width: 0.7em; }
+.am-tick--l { left: 0; } .am-tick--r { right: 0; }
+
+/* ── top-left: title block ────────────────────────────────────────────────── */
+.am-title { position: absolute; left: var(--pad); top: var(--pad); max-width: 40em; }
+.am-title .am-eyebrow { color: var(--ink-soft); }
+.am-h1 {
+  margin: 0.32em 0 0; font-family: var(--font-serif); font-weight: 400;
+  font-size: 4.1em; line-height: 0.95; letter-spacing: -0.012em; color: var(--ink); white-space: nowrap;
+}
+.am-h1 em { font-style: italic; color: var(--metal); letter-spacing: -0.005em; padding-right: 0.04em; }
+.am-rule { width: 100%; height: var(--hw); margin: 1.05em 0 0.8em; background: var(--hair); transform-origin: 0 50%; }
+.am-title-meta { display: flex; gap: 1.2em; }
+
+/* ── top-right: theme selector + status ───────────────────────────────────── */
+.am-tr { position: absolute; right: var(--pad); top: var(--pad); display: flex; flex-direction: column; align-items: flex-end; gap: 1em; }
+.am-themes {
+  position: relative; display: flex; align-items: center; padding: 0.28em;
+  border: var(--hw) solid var(--hair); border-radius: 99em; background: var(--wash);
+  -webkit-backdrop-filter: blur(10px) saturate(1.05); backdrop-filter: blur(10px) saturate(1.05);
+}
+.am-seg-ind {
+  position: absolute; left: 0; top: 0.28em; bottom: 0.28em; width: 10px; border-radius: 99em;
+  background: var(--tint); box-shadow: inset 0 0 0 var(--hw) var(--hair-soft);
+  transform-origin: 0 50%; pointer-events: none; will-change: transform, width, opacity;
+}
+.am-theme {
+  position: relative; display: flex; align-items: center; gap: 0.62em;
+  height: 2.35em; padding: 0 1em 0 0.72em; border-radius: 99em;
+}
+.am-theme svg { width: 1.2em; height: 1.2em; overflow: visible; flex: none; display: block; }
+.am-theme .am-hex-edge { fill: none; stroke: var(--ink); stroke-opacity: 0.32; stroke-width: 0.06; }
+.am-theme-name {
+  font-family: var(--font-mono); font-size: 0.64em; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink); opacity: 0.5; transition: opacity 0.35s cubic-bezier(.3,.7,.2,1);
+}
+.am-theme:hover .am-theme-name { opacity: 0.82; }
+.am-theme.is-active .am-theme-name { opacity: 1; }
+
+.am-status { position: relative; display: flex; align-items: center; gap: 0.75em; padding-right: 0.15em; }
+.am-status .am-mono { color: var(--ink); }
+.am-status .am-sep { color: var(--ink-soft); }
+.am-dot { position: relative; width: 0.46em; height: 0.46em; border-radius: 50%; background: var(--accent); flex: none; }
+.am-dot::after {
+  content: ''; position: absolute; inset: -0.32em; border-radius: 50%;
+  border: var(--hw) solid var(--accent); opacity: var(--ring, 0); transform: scale(var(--ring-s, 1));
+}
+.am-stack { display: inline-grid; }
+.am-stack > * {
+  grid-area: 1 / 1;
+  transition: opacity 0.42s cubic-bezier(.3,.7,.2,1) 0.14s, transform 0.5s cubic-bezier(.2,.8,.2,1) 0.14s;
+}
+.am-stack > :not(.is-on) {
+  opacity: 0; transform: translateY(-0.3em);
+  transition: opacity 0.16s cubic-bezier(.4,0,1,1), transform 0.2s cubic-bezier(.4,0,1,1);
+}
+.am-stack--l > * { justify-self: start; }
+.am-stack--c > * { justify-self: center; }
+.am-pct { display: inline-block; min-width: 4.1ch; text-align: right; color: var(--ink); }
+/* status markers (PAUSED, TOUR): hairline pills that sit just left of the dot */
+.am-marker {
+  position: absolute; right: calc(100% + 1.1em); top: 50%; translate: 0 -50%;
+  display: inline-flex; align-items: center; gap: 0.75em;
+  padding: 0.3em 0.75em 0.26em 0.95em; border: var(--hw) solid var(--hair-strong); border-radius: 99em;
+  color: var(--ink) !important; opacity: 0; pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(.3,.7,.2,1), transform 0.5s cubic-bezier(.2,.8,.2,1);
+}
+.am-marker.is-on { opacity: 1; }
+.am-marker-dot { width: 0.5em; height: 0.5em; border-radius: 50%; border: var(--hw) solid var(--accent); position: relative; flex: none; }
+.am-marker-dot::after { content: ''; position: absolute; inset: 0.12em; border-radius: 50%; background: var(--accent); }
+
+/* schematic key: a patent-plate legend under the status line (SCHEMATIC only) */
+.am-skey {
+  position: absolute; top: calc(100% + 2.6em); right: 0.15em; min-width: 13.5em;
+  opacity: 0; visibility: hidden; pointer-events: none; will-change: opacity;
+}
+.am-skey .am-panel-head { margin-bottom: 0.7em; }
+.am-skey-list { list-style: none; margin: 0; padding: 0; display: grid; row-gap: 0.42em; }
+.am-skey-item { display: flex; align-items: center; gap: 0.85em; will-change: opacity, transform; }
+.am-skey-n {
+  flex: none; width: 2em; height: 2em; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--ink-line); background: var(--paper); color: var(--ink-line);
+  font-family: var(--font-mono); font-size: 0.72em; letter-spacing: 0; line-height: 1; padding-top: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+.am-skey-name { font-family: var(--font-serif); font-size: 1.12em; line-height: 1.1; color: var(--ink); letter-spacing: 0.005em; white-space: nowrap; }
+
+/* ── bottom-left column: telemetry + specification ───────────────────────── */
+.am-bl { position: absolute; left: var(--pad); bottom: var(--pad); width: 24em; display: flex; flex-direction: column; gap: 1.5em; }
+
+.am-telemetry { position: relative; }
+.am-panel-head { display: flex; align-items: center; gap: 0.9em; margin-bottom: 0.85em; }
+.am-panel-head::after { content: ''; flex: 1; height: var(--hw); background: var(--hair-soft); order: 1; }
+.am-panel-head > :last-child:not(:first-child) { order: 2; }
+.am-tele-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.6em; row-gap: 0.55em; margin-bottom: 0.9em; }
+.am-tele-cell { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8em; border-bottom: var(--hw) dotted var(--hair-soft); padding-bottom: 0.35em; }
+.am-tele-val { font-family: var(--font-mono); font-size: 0.82em; letter-spacing: 0.06em; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.am-tele-val small { font-size: 0.82em; color: var(--ink-soft); margin-left: 0.35em; letter-spacing: 0.1em; }
+.am-scope { position: relative; height: 5.2em; }
+.am-scope canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.am-scope-key { display: flex; justify-content: space-between; margin-top: 0.6em; }
+.am-key-l, .am-key-r { display: inline-flex; align-items: center; gap: 0.7em; }
+.am-key-l i, .am-key-r i { display: inline-block; width: 1.9em; height: 0; border-top: 1.4px solid var(--ink); }
+.am-key-r i { border-top: var(--hw) dashed var(--ink); }
+
+.am-spec { position: relative; border-top: var(--hw) solid var(--hair); padding-top: 1.05em; }
+.am-spec-body { position: relative; display: grid; }
+.am-layer { grid-area: 1 / 1; align-self: start; will-change: opacity, transform; }
+.am-h2 { margin: 0.42em 0 0.5em; font-family: var(--font-serif); font-weight: 400; font-size: 2.15em; line-height: 1; letter-spacing: -0.005em; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.am-h2 em { font-style: italic; color: var(--metal); }
+.am-body { margin: 0; font-size: 0.92em; line-height: 1.55; color: var(--ink-soft); font-weight: 400; max-width: 31em; }
+.am-specrow { display: grid; grid-template-columns: repeat(4, auto); justify-content: space-between; margin: 1.3em 0 0; padding-top: 0.95em; border-top: var(--hw) solid var(--hair-soft); }
+.am-specrow > div { display: flex; flex-direction: column; gap: 0.35em; }
+.am-specrow dt { margin: 0; }
+.am-specrow dd { margin: 0; font-family: var(--font-serif); font-size: 1.7em; line-height: 1; color: var(--ink); white-space: nowrap; }
+.am-specrow dd small { font-family: var(--font-mono); font-size: 0.36em; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); margin-left: 0.4em; vertical-align: 0.35em; }
+.am-facts { margin: 1.05em 0 0; display: grid; grid-template-columns: 6.6em 1fr; column-gap: 1em; row-gap: 0.7em; padding-top: 0.9em; border-top: var(--hw) solid var(--hair-soft); }
+.am-facts dt { margin: 0; padding-top: 0.32em; }
+.am-facts dd { margin: 0; font-size: 0.9em; line-height: 1.5; color: var(--ink); }
+.am-facts dd.am-fact { color: var(--ink-soft); }
+.am-sel { color: var(--accent); }
+
+/* ── bottom-centre: control bar ───────────────────────────────────────────── */
+.am-barwrap { position: absolute; left: 0; right: 0; bottom: var(--pad); display: flex; justify-content: center; pointer-events: none; }
+.am-bar {
+  display: flex; flex-wrap: nowrap; align-items: center; justify-content: center; column-gap: 1.05em; row-gap: 0.1em;
+  min-height: 3.4em; padding: 0.38em 0.6em 0.38em 1.45em; max-width: 100%;
+  border: var(--hw) solid var(--hair); border-radius: 1.7em; background: var(--wash);
+  -webkit-backdrop-filter: blur(12px) saturate(1.05); backdrop-filter: blur(12px) saturate(1.05);
+}
+/* One row when it fits (rows dissolve into the bar; `order` interleaves them). When it does not, the bar becomes a
+   deliberate two-deck control: transport on top (explode · flight · orbit · tempo), view and render below. It never
+   wraps on its own, so no control can drop to another line while you use it. */
+.am-bar-row { display: contents; }
+.am-bar.is-compact { flex-direction: column; align-items: stretch; row-gap: 0; padding: 0.2em 1.35em; border-radius: 1.5em; }
+.am-bar.is-compact .am-bar-row { display: flex; align-items: center; justify-content: center; column-gap: 1.05em; min-height: 3em; }
+.am-bar.is-compact .am-bar-row + .am-bar-row { border-top: var(--hw) solid var(--hair); }
+.am-bar.is-compact .am-vsep--wide { display: none; }
+.am-bar.is-stack .am-bar-row { flex-wrap: wrap; row-gap: 0.1em; padding: 0.25em 0; }
+.am-ctl { display: flex; align-items: center; gap: 0.75em; height: 2.6em; }
+.am-ctl .am-seg { margin-left: -0.35em; }
+.am-ctl-label { color: var(--ink-soft); }
+.am-vsep { width: var(--hw); height: 1.35em; background: var(--hair); flex: none; transition: opacity 0.2s; }
+.am-vsep.is-hidden { opacity: 0; width: 0; margin: 0 -0.525em; }
+
+.am-seg { position: relative; display: flex; align-items: center; gap: 0.15em; }
+.am-seg button {
+  position: relative; height: calc(2.6em / 0.66); padding: 0 0.62em 0 0.8em;
+  font-family: var(--font-mono); font-size: 0.66em; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink); opacity: 0.48; transition: opacity 0.3s cubic-bezier(.3,.7,.2,1);
+}
+.am-seg button:hover { opacity: 0.85; }
+.am-seg button.is-active { opacity: 1; }
+.am-seg-line {
+  position: absolute; left: 0; bottom: 0.45em; height: var(--hw); width: 10px; background: var(--ink);
+  pointer-events: none; transform-origin: 0 50%; will-change: transform, width, opacity;
+}
+
+.am-primary {
+  position: relative; height: 2.6em; padding: 0 1.35em; border-radius: 99em; background: var(--accent); color: var(--accent-ink) !important;
+  display: inline-flex; align-items: center; justify-content: center; overflow: hidden;
+  transition: transform 0.35s cubic-bezier(.3,.7,.2,1);
+}
+.am-primary::before { content: ''; position: absolute; inset: 0; background: var(--accent-ink); opacity: 0; transition: opacity 0.35s; }
+.am-primary:hover::before { opacity: 0.1; }
+.am-primary:active { transform: scale(0.975); }
+.am-primary .am-mono { position: relative; color: var(--accent-ink); font-weight: 500; letter-spacing: 0.22em; font-size: 0.68em; }
+
+.am-toggle { display: inline-flex; align-items: center; gap: 0.7em; height: 2.6em; padding: 0 0.3em; }
+.am-toggle .am-mono { color: var(--ink); opacity: 0.48; transition: opacity 0.3s cubic-bezier(.3,.7,.2,1); }
+.am-toggle:hover .am-mono { opacity: 0.85; }
+.am-toggle.is-active .am-mono { opacity: 1; }
+.am-toggle svg { width: 1.05em; height: 1.05em; overflow: visible; display: block; }
+.am-toggle svg path { fill: none; stroke: var(--ink); stroke-width: 1.1; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.am-toggle .am-led { width: 0.36em; height: 0.36em; border-radius: 50%; border: var(--hw) solid var(--ink); position: relative; opacity: 0.6; }
+.am-toggle .am-led::after { content: ''; position: absolute; inset: -1px; border-radius: 50%; background: var(--accent); opacity: var(--on, 0); }
+
+/* custom range slider: hairline track, small precise thumb */
+/* (the side margins give the thumb's overhang at either end its own room) */
+.am-slider { position: relative; width: 6.2em; height: 2.6em; margin: 0 0.45em; cursor: pointer; touch-action: none; outline: none; }
+.am-slider-track { position: absolute; left: 0; right: 0; top: 50%; height: var(--hw); background: color-mix(in srgb, var(--ink) 24%, transparent); }
+.am-slider-fill { position: absolute; left: 0; top: 50%; height: var(--hw); width: 100%; background: var(--ink); transform-origin: 0 50%; }
+.am-slider-tick { position: absolute; top: calc(50% - 0.3em); width: var(--hw); height: 0.6em; background: color-mix(in srgb, var(--ink) 34%, transparent); }
+.am-slider-tick.is-minor { top: calc(50% - 0.18em); height: 0.36em; background: color-mix(in srgb, var(--ink) 20%, transparent); }
+.am-slider-thumb {
+  position: absolute; left: 0; top: 50%; width: 0.95em; height: 0.95em; margin: -0.475em 0 0 -0.475em; border-radius: 50%;
+  background: var(--paper); box-shadow: inset 0 0 0 1.1px var(--ink); will-change: transform;
+}
+.am-slider-thumb::after { content: ''; position: absolute; inset: 0.32em; border-radius: 50%; background: var(--ink); transform: scale(0); transition: transform 0.3s cubic-bezier(.3,.7,.2,1); }
+.am-slider:hover .am-slider-thumb::after, .am-slider.is-drag .am-slider-thumb::after { transform: scale(1); }
+/* fixed width: the longest value ("1/500×") must never resize the bar */
+.am-readout { display: inline-block; flex: none; width: 6.4em; color: var(--ink); text-align: left; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* ── bottom-right: controls legend ────────────────────────────────────────── */
+/* A two-column key: keycaps right-aligned in their own column, actions left-aligned beside them. */
+.am-legend { position: absolute; right: var(--pad); bottom: var(--pad); width: max-content; text-align: left; }
+.am-legend .am-panel-head { flex-direction: row-reverse; }
+.am-legend .am-legend-q { display: none; }
+.am-legend-list {
+  display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, auto); grid-auto-columns: max-content;
+  column-gap: 1.7em; row-gap: 0.45em; justify-content: end; font-size: 0.8em; color: var(--ink-soft); line-height: 1;
+}
+.am-legend-item { display: grid; grid-template-columns: 6.1em max-content; column-gap: 0.65em; align-items: center; white-space: nowrap; }
+.am-legend-item kbd { justify-self: end; }
+/* compact viewports: the key folds into a "Controls ?" chip and opens on hover / focus */
+.am-legend.is-compact { pointer-events: auto; cursor: help; }
+.am-legend.is-compact .am-panel-head { flex-direction: row; justify-content: flex-end; gap: 0.7em; margin: 0; padding: 0.5em 0 0.5em 0.9em; }
+.am-legend.is-compact .am-panel-head::after { display: none; }
+.am-legend.is-compact .am-legend-q { display: inline-flex; }
+.am-legend.is-compact .am-legend-list {
+  position: absolute; right: 0; bottom: calc(100% + 0.5em); padding: 1.15em 1.3em;
+  border: var(--hw) solid var(--hair); border-radius: 1em; background: color-mix(in srgb, var(--panel) 90%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.05); backdrop-filter: blur(14px) saturate(1.05);
+  opacity: 0; transform: translate3d(0, 0.5em, 0); pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.36s cubic-bezier(.2,.7,.2,1);
+}
+.am-legend.is-compact:hover .am-legend-list, .am-legend.is-compact:focus-within .am-legend-list { opacity: 1; transform: none; pointer-events: auto; }
+.am-kbd {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 1.85em; height: 1.85em; padding: 0 0.5em;
+  font-family: var(--font-mono); font-size: 0.78em; letter-spacing: 0.06em; color: var(--ink);
+  border: var(--hw) solid var(--hair); border-bottom-width: calc(var(--hw) * 2); border-radius: 0.38em; background: var(--wash);
+}
+.am-kbd.is-on { background: var(--tint); border-color: var(--hair-strong); }
+
+/* ── labels layer ─────────────────────────────────────────────────────────── */
+.am-labels { position: absolute; inset: 0; pointer-events: none; }
+.am-leaders { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.am-leaders path { fill: none; stroke: var(--ink-line); stroke-width: var(--hw); stroke-opacity: 0.62; }
+.am-leaders circle { fill: var(--paper); stroke: var(--ink-line); stroke-width: 1px; }
+.am-leaders circle.is-hover { fill: var(--accent); stroke: var(--accent); }
+.am-label {
+  position: absolute; left: 0; top: 0; padding: 0.1em 0.2em; cursor: pointer; white-space: nowrap;
+  will-change: transform, opacity; opacity: 0; pointer-events: none;
+}
+.am-label.is-live { pointer-events: auto; }
+.am-label[data-side='l'] { text-align: right; }
+/* a soft halo in the backdrop colour keeps type crisp where a leader or a part passes behind */
+.am-label-name, .am-label-cap { text-shadow: 0 0 0.35em var(--bg), 0 0 0.12em var(--bg); }
+.am-label-name { font-family: var(--font-serif); font-size: 1.36em; line-height: 1.05; color: var(--ink); letter-spacing: 0.002em; }
+.am-label-cap { margin-top: 0.38em; font-family: var(--font-mono); font-size: 0.6em; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); line-height: 1.2; }
+.am-label-no { color: var(--ink-soft); opacity: 0.8; }
+.am-label.is-hover .am-label-name { font-style: italic; color: var(--metal); }
+
+/* ── schematic annotations (created by main.js inside #annot) ─────────────── */
+#annot .annot {
+  position: absolute; top: 0; left: 0; font-family: var(--font-mono); font-size: 10px; font-weight: 400;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-line); white-space: nowrap;
+  will-change: transform; line-height: 1.2; pointer-events: none; font-variant-numeric: tabular-nums;
+}
+#annot .annot--dim { padding: 1px 5px; background: var(--paper); }
+#annot .annot--callout {
+  width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; letter-spacing: 0;
+  border: 1px solid var(--ink-line); border-radius: 50%; background: var(--paper); font-size: 9px; padding-top: 1px;
+}
+#annot .annot--note { color: var(--ink-soft); }
+
+@media (prefers-reduced-motion: reduce) {
+  #ui .am-stack > *, .am-seg button, .am-theme-name, .am-toggle .am-mono { transition-duration: 0.01s; }
+}

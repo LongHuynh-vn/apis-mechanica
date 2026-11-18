@@ -27,6 +27,7 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             GPT-6.2 Astra/package-lock.json
+            Claude Fable 5.2/package-lock.json
       - run: npm ci
       - run: npm run build
       - name: Build the GPT-6.2 Astra edition
@@ -35,6 +36,11 @@ jobs:
           npm ci
           npm test
           npm run build -- --base=./ --outDir "../dist/GPT-6.2 Astra"
+      - name: Build the Claude Fable 5.2 edition
+        working-directory: Claude Fable 5.2
+        run: |
+          npm ci
+          npm run build -- --outDir "../dist/Claude Fable 5.2"
       - name: Upload the site
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:

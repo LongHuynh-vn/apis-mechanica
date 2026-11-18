@@ -6,6 +6,8 @@ A Three.js exhibit of an articulated mechanical honeybee. The geometry, wing ven
 
 The GPT-6.2 Astra edition has its own [live exhibit](https://longhuynh-vn.github.io/apis-mechanica/GPT-6.2%20Astra/) and [source folder](./GPT-6.2%20Astra/).
 
+The Claude Fable 5.2 edition has its own [live exhibit](https://longhuynh-vn.github.io/apis-mechanica/Claude%20Fable%205.2/) and [source folder](./Claude%20Fable%205.2/).
+
 ```sh
 npm ci
 npm run dev
